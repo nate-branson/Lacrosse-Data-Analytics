@@ -147,6 +147,7 @@ def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1,
     # hand: Both-B ; Right-R ; Left-L
 
     field = make_field(size = "half", extra = True)
+    fig = field[0]
     ax = field[1]
 
     data_loc_x  =   data['loc_x']
@@ -265,6 +266,38 @@ def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1,
     ax.scatter(loc_x_bl, loc_y_bl, color=block, alpha=.5, edgecolors="black", s=60, label='block')
     ax.scatter(loc_x_pi, loc_y_pi, color=pipe,  alpha=.5, edgecolors="black", s=60, label='pipe' )
 
+
+    # text box showing shooting percentages and average distance
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    textstr = '\n'.join((r'goals: $\frac{%d}{%d}=%.2f$' % (goals,shots,round(shot_per, 2), ), r'shots on goal: $\frac{%d}{%d}=%.2f$' % (sog,shots,round(sog_per, 2), )
+    , r'avg distance shot: $%.2f$' % (round(avg_dist, 2), )))
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+    ax.legend(loc = [0.88, 0.8155])
+
+    # title of chart
+    if game == "":
+        if player>-1:
+            plt.title(r'Shot Chart for #%d' % player)
+            text = (r'../Messiah_Shot/Shot_%d.png' % player)
+            plt.savefig(text)
+        else:
+            plt.title("Shot Chart Team")
+            plt.savefig('../Messiah_Shot/Shot_team.png')
+    else:
+        if player>-1:
+            text = '\n'.join([r'Shot Chart for #%d' % player, game])
+            plt.title(text)
+            text = r'../Messiah_Shot/' + game + '/' + date + r'_Shot_' + game + r'_%d.png' % player
+            
+        else:
+            text = '\n'.join([r'Shot Chart for Team', game])
+            plt.title(text)
+            text = '../Messiah_Shot/' + game + '/' + date + '_Shot_'+game+'_team.png'
+            print(text)
+            plt.savefig(text)
+
+
     if extra:
         for i, txt in enumerate(new_loc_goal):
             ax.annotate(txt, (loc_x[i]+.1, loc_y[i]+.1))
@@ -276,38 +309,13 @@ def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1,
             ax.annotate(txt, (loc_x[i]+1.85, loc_y[i]+.1))
         for i, txt in enumerate(dist_arr):
             ax.annotate(txt, (loc_x[i]+2.3, loc_y[i]+.1))
-        
+        im = plt.imread('images/goal.png') # insert local path of the image.
+        newax = fig.add_axes([0.8,0.8,0.2,0.2], anchor='NE', zorder=1)
+        newax.imshow(im)
+        newax.axis('off')        
 
-    #text = "goal per: ", goals, "/", shots, "=", round(, 2), "%\n", "shots on goal per: ", sog, "/", shots, "=", round(sog_per, 2), "%"
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    textstr = '\n'.join((r'goals: $\frac{%d}{%d}=%.2f$' % (goals,shots,round(shot_per, 2), ), r'shots on goal: $\frac{%d}{%d}=%.2f$' % (sog,shots,round(sog_per, 2), )
-    , r'avg distance shot: $%.2f$' % (round(avg_dist, 2), )))
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-    ax.legend(loc = [0.88, 0.8155])
-
-    if game == "":
-        if player>-1:
-            plt.title(r'Shot Chart for #%d' % player)
-            text = (r'data/Shot_Charts/Shot_%d.png' % player)
-            plt.savefig(text)
-        else:
-            plt.title("Shot Chart Team")
-            plt.savefig('data/Shot_Charts/Shot_team.png')
-    else:
-        if player>-1:
-            text = '\n'.join([r'Shot Chart for #%d' % player, game])
-            plt.title(text)
-            text = r'data/Shot_Charts/' + game + '/' + date + r'_Shot_' + game + r'_%d.png' % player
-            print(text)
-            plt.savefig(text)
-        else:
-            text = '\n'.join([r'Shot Chart for Team', game])
-            plt.title(text)
-            text = 'data/Shot_Charts/' + game + '/' + date + '_Shot_'+game+'_team.png'
-            print(text)
-            plt.savefig(text)
-
+    print(text)
+    plt.savefig(text)
 
 
 def plot_goal_locs(data):#, fig):
@@ -337,9 +345,9 @@ def plot_goal_locs(data):#, fig):
 
 
 def main():
-    game        = "F&M"
-    date        = "Feb26"
-    data, _     = read_file('data/Shot_Charts/' + game + '/' + date + '_Shot_' + game + '.csv')
+    game        = "Kings"
+    date        = "Mar2"
+    data, _     = read_file('../Messiah_Shot/' + game + '/' + date + '_Shot_' + game + '.csv')
     shooters    = data['shooter']
     players = []
     for i in shooters:
@@ -347,7 +355,7 @@ def main():
             players.append(i)
     #players.append(-1)
     
-    #data = read_multi_files('data/Shot_Charts')
+    #data = read_multi_files('../Messiah_Shot/Shot_Charts')
     #print(data)
     for i in players:
         plot_shot_locs(data, player = i, game = game, date = date, extra = True)
