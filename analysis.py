@@ -56,7 +56,7 @@ def shot_percentage(data, show=True, hand="both"):
     
     return goals, shot_per, sog, sog_per, shots
 
-def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1, game = "", extra = False, date = ""):
+def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1, game = "", extra = False, date = "", pic_dir = ""):
     # hand: Both-B ; Right-R ; Left-L
 
     field = make_field(size = "half", extra = True)
@@ -192,21 +192,21 @@ def plot_shot_locs(data, shot_hand='B', max_dist=100, min_dist=-20, player = -1,
     if game == "":
         if player>-1:
             plt.title(r'Shot Chart for #%d' % player)
-            text = (r'../Messiah_Shot/Shot_%d.png' % player)
+            text = (pic_dir + r'/Shot_%d.png' % player)
             plt.savefig(text)
         else:
             plt.title("Shot Chart Team")
-            plt.savefig('../Messiah_Shot/Shot_team.png')
+            plt.savefig(pic_dir + '/Shot_team.png')
     else:
         if player>-1:
             text = '\n'.join([r'Shot Chart for #%d' % player, game])
             plt.title(text)
-            text = r'../Messiah_Shot/' + game + '/' + date + r'_Shot_' + game + r'_%d.png' % player
+            text = pic_dir + r'/' + game + '/' + date + r'_Shot_' + game + r'_%d.png' % player
             
         else:
             text = '\n'.join([r'Shot Chart for Team', game])
             plt.title(text)
-            text = '../Messiah_Shot/' + game + '/' + date + '_Shot_'+game+'_team.png'
+            text = pic_dir + '/' + game + '/' + date + '_Shot_'+game+'_team.png'
             print(text)
             plt.savefig(text)
 
