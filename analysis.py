@@ -1,18 +1,24 @@
-
+### analysis.py
 '''
-Y=0;N=1;N/A=2
+author:             Nathan Branson
+description:        contains functions for plotting shooting locations and 
+                    shooting percentages.
 
-Shooter:        6: Nathan Branson
-goalie_hand:    R=0;L=1
-Hand:           R=0;L=1
-type_shot_0:    OH=0;SA=1;UH=2;BH=3;BTB=4
-type_shot_1:    Stationary=0;OtR=1;QS=2;?
-loc_x:          -10,10
-loc_y:          0,20
-loc_goal:       0,17 (0 is miss; 17 is N/A)
-result:         goal=0;save=1;miss=2
-screened:       Y=0;N=1;N/A=2
-HUDL Timestamp: time
+DATA: (see Documentation.pdf for full descriptions)
+    shot_num:       int
+    shooter:        int
+    goalie_hand:    R=0;L=1
+    Hand:           R=0;L=1
+    type_shot_0:    OH=0;SA=1;UH=2;BH=3;BTB=4;twister=5
+    type_shot_1:    Stationary=0;OtR=1;QS=2
+    loc_x:          [-20,20]
+    loc_y:          [0,20]
+    dist:           float
+    loc_goal:       [0,29] (subject to change)
+    result:         goal=0;save=1;miss=2;pipe=3;blocked=4
+    screened:       Y=0;N=1;N/A=2
+    HUDL Timestamp: float
+    Notes:          string
 '''
 
 from cmath import sqrt
@@ -21,101 +27,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import datetime
 import pathlib
+from visualization import *
 
-def read_file(file, show = False):
-    data = pd.read_csv(file)
-    shape = data.shape
-
-    if show:
-        print(data)
-
-    return data, shape
-
-def read_multi_files(dir, show = False):
-    data = []
-    for path in pathlib.Path(dir).iterdir():
-        if path.is_file():
-            current_file = open(path, "r")
-            data_file, _ = read_file(current_file)
-            data.append(data_file)
-    data = pd.concat(data,ignore_index=True)
-
-    if show:
-        print(data)
-    return data
-
-def make_field(size="half", extra = False):
-
-    if   size == "half":
-        fig, ax = plt.subplots(figsize=(20,15))
-        plt.xlim([-32,32])
-        plt.ylim([-18,42])
-    elif size == "full":
-        fig, ax = plt.subplots(figsize=(7,15))
-
-        plt.xlim([-32,32])
-        plt.ylim([-18,97])
-
-    crease1 = plt.Circle((0,0),3,color='black', fill=False)
-    crease2 = plt.Circle((0,80),3,color='black', fill=False)
-    ax.add_patch(crease1)
-    ax.add_patch(crease2)
-
-
-    # box lines
-    x, y = [-30, 30], [20,20]
-    plt.plot(x, y, color = 'black')
-    x, y = [-20,-20], [-15,20]
-    plt.plot(x, y, color = 'black')
-    x, y = [20, 20], [-15,20]
-    plt.plot(x, y, color = 'black')
-    x, y = [-30, 30], [60,60]
-    plt.plot(x, y, color = 'black')
-    x, y = [-20,-20], [60,95]
-    plt.plot(x, y, color = 'black')
-    x, y = [20, 20], [60,95]
-    plt.plot(x, y, color = 'black')
-    if extra:
-        x, y = [-20, 20], [15,15]
-        plt.plot(x, y, 'k:')
-        x, y = [-20, 20], [10,10]
-        plt.plot(x, y, 'k:')
-        x, y = [-20, 20], [5,5]
-        plt.plot(x, y, 'k:')
-
-    # midline
-    x, y = [-30, 30], [40,40]
-    plt.plot(x, y, color = 'black')
-
-    #endline
-    x, y = [-30, 30], [-15,-15]
-    plt.plot(x, y, color = 'black')
-    x, y = [-30, 30], [95,95]
-    plt.plot(x, y, color = 'black')
-
-    #sidelines
-    x, y = [-30, -30], [-15,95]
-    plt.plot(x, y, color = 'black')
-    x, y = [ 30,  30], [-15,95]
-    plt.plot(x, y, color = 'black')
-
-    return fig, ax
-
-def make_goal():
-    fig, ax = plt.subplots(figsize=(7,7))
-
-    plt.xlim([-1,7])
-    plt.ylim([-1,7])
-    x, y = [0, 6], [0,0]
-    plt.plot(x, y, color = 'black')
-    x, y = [0,6], [6,6]
-    plt.plot(x, y, color = 'black')
-    x, y = [6, 6], [0,6]
-    plt.plot(x, y, color = 'black')
-    x, y = [0, 0], [0,6]
-    plt.plot(x, y, color = 'black')
-
-    return fig, ax
 
 def shot_percentage(data, show=True, hand="both"):
 
@@ -342,28 +255,3 @@ def plot_goal_locs(data):#, fig):
 
 
     plt.show()
-
-
-def main():
-    game        = "Kings"
-    date        = "Mar2"
-    data, _     = read_file('../Messiah_Shot/' + game + '/' + date + '_Shot_' + game + '.csv')
-    shooters    = data['shooter']
-    players = []
-    for i in shooters:
-        if not i in players:
-            players.append(i)
-    #players.append(-1)
-    
-    #data = read_multi_files('../Messiah_Shot/Shot_Charts')
-    #print(data)
-    for i in players:
-        plot_shot_locs(data, player = i, game = game, date = date, extra = True)
-    plot_shot_locs(data, player = -1, game = game, date = date)
-    
-
-    #plot_goal_locs(data)
-
-
-if __name__ == '__main__':
-    main()
